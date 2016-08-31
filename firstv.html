@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+
+</style>
+
+<form>
+
+  <input id="clickMe" type="button" value="first visualisation" onclick="redirect(1);" />
+  <input id="clickMe" type="button" value="secund visualisation" onclick="redirect(2);" />
+  <input id="clickMe" type="button" value="third visualisation" onclick="redirect(3);" />
+  <input id="clickMe" type="button" value="fourth visualisation" onclick="redirect(4);" />
+
+  <label><input type="radio" name="mode" value="grouped"> Years representation</label>
+  <label><input type="radio" name="mode" value="stacked" checked> Age representation </label>
+
+  </form>
+
+  <br> 2012 --- green
+  <br> 2013 --- pink 
+  <br> 2014 --- yellow
+  <br> 2015 --- LightBlue 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8" ></script>
+<script> 
+ 
+//// fadi code
+function redirect(i) {
+	if(i==1){
+		window.location="visu.html";
+	}
+	if(i==2){
+		window.location="firstv.html";
+	}
+	if(i==3){
+		window.location="sad.html";
+	}
+	if(i==4){
+		window.location="sun.html";
+	}
+}
+
+
+ 
+	 d3.csv("Drug.csv", function(error, data) {
+
+	 
+	 var skillsdata = null ;
+  // Convert strings to numbers.
+  data.forEach(function(d) {
+    //d.people = +d.people;
+    //d.year = +d.year;
+    //d.age = +d.age;
+  });
+
+  // compute the new data 
+  var newData =[]
+  var size = 0;
+
+	data.forEach(function(d) {
+	
+	var date = d.Date.split("/") ;
+	var year = date[2] ;
+	var gender = d.Sex ;
+	var age = d.Age ;
+	var race = d.Race ;
+	
+ 
+	
+	
+
+		
+		 var newOp = { Race:race , Age:age , Year:year, Sex:gender , People:1 };
+			newData.push(newOp) ;
+		 size = size + 1 ;
+
+	
+	});
+  
+  // Compute the extent of the data set in age and years.
+  var age1 = d3.max(newData, function(d) { return d.Age; }),
+	  age0 = d3.min(newData, function(d) { return d.Age; }),
+      year0 = d3.min(newData, function(d) { return d.Year; }),
+      year1 = d3.max(newData, function(d) { return d.Year; }),
+      year = year1;
+	 
+	 
+  // repair the opjects to fill them
+  		var Y2012 = [[] , [] , [] ,  [] , [] , [] , [] , [] , [] ] ;
+		var Y2013 = [[] , [] , [] ,  [] , [] , [] , [] , [] , [] ] ;
+		var Y2014 = [[] , [] , [] ,  [] , [] , [] , [] , [] , [] ] ;
+		var Y2015 = [[] , [] , [] ,  [] , [] , [] , [] , [] , [] ] ;
+console.log(Y2013);
+	
+  // fill in the black opjects
+	
+
+
+	for (i = 0; i < 9; i++) { 
+		year1 = 0 ;
+		year2 = 0 ;
+		year3 = 0 ;
+		year4 = 0 ;
+		var from_age = 10 * i ;
+		var to_age = from_age + 10 ;
+		newData.forEach(function(d) {
+			if(   d.Age < to_age && d.Age >= from_age ){
+				if( d.Year == "2012"){
+					year1 = year1 + 1 ;
+				}
+				if( d.Year == "2013"){
+					year2 = year2 + 1 ;
+				}
+				if( d.Year == "2014"){
+					year3 = year3 + 1 ;
+				}
+				if( d.Year == "2015"){
+					year4 = year4 + 1 ;
+				}
+				
+				
+			}
+			});
+			var index = i  ;
+	
+			
+				(Y2012)[index]={x:i,y:year1,y0:0};
+				(Y2013)[index]={x:i,y:year2,y0:0};
+				(Y2014)[index]={x:i,y:year3,y0:0};
+				(Y2015)[index]={x:i,y:year4,y0:0};
+				
+	}
+	
+	myData = [Y2012,Y2013,Y2014,Y2015]
+	for (i = 1; i < 4; i++) { 
+		for (j = 0; j < 9; j++) { 
+			
+			((myData[i])[j]).y0 = ((myData[i-1])[j]).y + ((myData[i-1])[j]).y0 ;
+		
+		}	
+	}
+	
+////////////////////      fadi end 
+
+////
+var n = 4, // number of layers
+    m = 9, // number of samples per layer
+    stack = d3.layout.stack(),
+    layers =   myData ; 
+    yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
+    yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+
+	console.log(layers);
+	
+	
+var margin = {top: 40, right: 10, bottom: 20, left: 10},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .domain(d3.range(m))
+    .rangeRoundBands([0, width], .08);
+
+var y = d3.scale.linear()
+    .domain([0, yStackMax])
+    .range([height, 0]);
+
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .tickSize(0)
+    .tickPadding(6)
+    .orient("bottom");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var layer = svg.selectAll(".layer")
+    .data(layers)
+  .enter().append("g")
+    .attr("class", "layer")
+    .style("fill", function(d, i) { return mycolor(i); });
+
+var rect = layer.selectAll("rect")
+    .data(function(d) { return d; })
+  .enter().append("rect")
+    .attr("x", function(d) { return x(d.x); })
+    .attr("y", height)
+    .attr("width", x.rangeBand())
+    .attr("height", 0);
+
+rect.transition()
+    .delay(function(d, i) { return i * 10; })
+    .attr("y", function(d) { return y(d.y0 + d.y); })
+    .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+d3.selectAll("input").on("change", change);
+
+
+
+function change() {
+  if (this.value === "grouped"){ transitionGrouped();}
+  else {
+  transitionStacked();}
+}
+
+function transitionGrouped() {
+  y.domain([0, yGroupMax]);
+
+  rect.transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .attr("x", function(d, i, j) { return x(d.x) + x.rangeBand() / n * j; })
+      .attr("width", x.rangeBand() / n)
+    .transition()
+      .attr("y", function(d) { return y(d.y); })
+      .attr("height", function(d) { return height - y(d.y); });
+}
+
+function transitionStacked() {
+  y.domain([0, yStackMax]);
+
+  rect.transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .attr("y", function(d) { return y(d.y0 + d.y); })
+      .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); })
+    .transition()
+      .attr("x", function(d) { return x(d.x); })
+      .attr("width", x.rangeBand());
+}
+var element = document.getElementsByTagName("text");
+for(i = 0 ; i < 9 ; i++){
+	 var to = parseInt(element[i].innerHTML) * 10 ;
+	 var tooo = to + 10
+	 element[i].innerHTML = to + "-" + tooo +"years" ;
+ }
+
+ function mycolor (i){
+	if(i==0){ 
+	return "#ADFF2F"; //GreenYellow  
+	}
+	if(i==1){ 
+	return "#FF00FF"; //Fuchsia 
+	}
+		if(i==2){ 
+	return "#FFFF00	"; // lavender
+	}
+		if(i==3){ 
+	return "#ADD8E6"; //LightBlue 
+	}
+	
+ }
+});
+</script>

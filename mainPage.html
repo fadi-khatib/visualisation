@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+</style>
+<body>
+
+
+
+
+<form>
+  <input id="clickMe" type="button" value="first visualisation" onclick="redirect(1);" />
+  <input id="clickMe" type="button" value="secund visualisation" onclick="redirect(2);" />
+  <input id="clickMe" type="button" value="third visualisation" onclick="redirect(3);" />
+  <input id="clickMe" type="button" value="fourth visualisation" onclick="redirect(4);" />
+</form>
+
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
+      <script type="text/javascript">
+            function redirect(i) {
+				if(i==1){
+					window.location="visu.html";
+				}
+				if(i==2){
+					window.location="firstv.html";
+				}
+				if(i==3){
+					window.location="sad.html";
+				}
+				if(i==4){
+					window.location="sun.html";
+				}
+            }
+      </script>
+</body>

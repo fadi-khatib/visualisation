@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<form>
+  <input id="clickMe" type="button" value="first visualisation" onclick="redirect(1);" />
+  <input id="clickMe" type="button" value="secund visualisation" onclick="redirect(2);" />
+  <input id="clickMe" type="button" value="third visualisation" onclick="redirect(3);" />
+  <input id="clickMe" type="button" value="fourth visualisation" onclick="redirect(4);" />
+</form>
+  <head>
+    <meta charset="utf-8">
+    <title>sunburst</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="sun.css"/>
+  </head>
+  <body>
+    <div id="skills">
+      <div id="skillmap">
+        <div class="skills-wrapper">
+          <div class="skills-sunburst"></div>
+          <div class="skills-chart">
+            <div id="skills-chart-breadcrumb"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="sun.js"></script>
+    <script type="text/javascript">
+      function redirect(i) {
+	if(i==1){
+		window.location="visu.html";
+	}
+	if(i==2){
+		window.location="firstv.html";
+	}
+	if(i==3){
+		window.location="sad.html";
+	}
+	if(i==4){
+		window.location="sun.html";
+	}
+}
+
+      d3.select(self.frameElement).style("height", "700px");
+		
+			
+	  
+	  
+  </script> 
+  </body>
+</html>

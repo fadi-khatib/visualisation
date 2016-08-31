@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+</style>
+<body>
+<form>
+  <input id="clickMe" type="button" value="first visualisation" onclick="redirect(1);" />
+  <input id="clickMe" type="button" value="secund visualisation" onclick="redirect(2);" />
+  <input id="clickMe" type="button" value="third visualisation" onclick="redirect(3);" />
+  <input id="clickMe" type="button" value="fourth visualisation" onclick="redirect(4);" />
+</form>
+
+
+
+<form>
+  <input id="clickMe" type="button" value="age <20" onclick="make(1);" />
+  <input id="clickMe" type="button" value="age 20-30" onclick="make(2);" />
+  <input id="clickMe" type="button" value="age >30" onclick="make(3);" />
+  <input id="clickMe" type="button" value="all ages" onclick="make(4);" />
+  <input id="clickMe" type="button" value="remove gtaph to create new one" onclick="location.reload();" />
+</form>
+  <br>///////////////////////////black male --- green
+  <br>///////////////////////////black female-- light purple 
+  <br>/////////////////////////// white male---blue
+  <br>///////////////////////////                 white female --- dark purple
+  <br>///////////////////////////                           other male ---red
+  <br>///////////////////////////                           other female --orange
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
+<script>
+
+function redirect(i) {
+	if(i==1){
+		window.location="visu.html";
+	}
+	if(i==2){
+		window.location="firstv.html";
+	}
+	if(i==3){
+		window.location="sad.html";
+	}
+	if(i==4){
+		window.location="sun.html";
+	}
+}
+
+var width = 1560,
+    height = 500,
+    radius = Math.min(width, height) / 2;
+var color = d3.scale.ordinal()
+    .range(["#7FFF00", "#00FFFF", "#7b6888", "#6b486b",	"#DC143C","#FF8C00"]);
+var arc = d3.svg.arc()
+    .outerRadius(radius - 10)
+    .innerRadius(0);
+var labelArc = d3.svg.arc()
+    .outerRadius(radius - 40)
+    .innerRadius(radius - 40);
+var pie = d3.layout.pie()
+    .sort(null)
+    .value(function(d) { return d.number; });
+	
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+console.log("before");
+
+
+function make(flow) {
+ 
+d3.csv("Drug.csv",function(error, data) {
+  if (error) throw error;
+   console.log(data[0]);
+   
+  var gender_color = [{ ColorAndGender :"black male", number  :0 }, {ColorAndGender : "white male", number : 0}  ,{ColorAndGender : "black female", number  : 0 }  ,{ColorAndGender : "white female", number  :0  } ,
+						{ ColorAndGender :"Other male", number  :0} , {ColorAndGender :"Other female", number  :0}] ; 
+  var SUM=0;
+  data.forEach(function(d) {
+	age = parseFloat(d.Age) ;
+	console.log(age)
+	if ( (flow == 1 && age <= 20 ) ||  (flow == 2&& age > 20 && age <= 30) || (flow == 3 && age >30) || (flow == 4) ) {
+    	if (d.Sex == "Male" ) {
+	    	if (d.Race == "White") {
+				console.log("black--------------------");
+				gender_color[1]["number"] += 1 ;
+			}
+			else if ( d.Race == "Black"){
+				gender_color[0]["number"] += 1 ;	
+			}else {
+				gender_color[4]["number"] += 1 ;	
+			}
+		} else {
+			if (d.Race == "Black") {
+				gender_color[2]["number"] += 1 ;
+			}
+			else if ( d.Race == "White"){
+				gender_color[3]["number"] += 1 ;	
+			}
+			else {
+				gender_color[5]["number"] += 1 ;
+			}
+	
+		}	
+		SUM += 1;
+	}
+	
+	});
+	console.log(gender_color);
+	console.log(gender_color[0]);
+	
+	
+	var g = svg.selectAll(".arc")
+      .data(pie(gender_color))
+    .enter().append("g")
+      .attr("class", "arc");
+	
+	g.append("path")
+      .attr("d", arc)
+      .style("fill", function(d) { return color(d.data.ColorAndGender); });
+	g.append("text")
+      .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+      .attr("dy", ".35em")
+      .text(function(d) { return (d.data.number*100/SUM).toFixed(2).toString().concat("% ") });
+	
+	
+	
+	
+	
+} );
+}
+
+</script>
